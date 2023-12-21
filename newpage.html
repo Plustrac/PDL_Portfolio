@@ -1,0 +1,330 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Portfolio Pierre DE LUSTRAC</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+
+					</header>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul class="links">
+						<li class="active"><a href="index.html">Few projects</a></li>
+						<li><a href="generic.html">About me</a></li>
+					</ul>
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/pierre-de-lustrac-a890a1170/" class="icon brands fa-linkedin"><span class="label">linkedin</span></a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<h1>Data exploration in SQL</p>
+								</header>
+								<div class="image main" style="max-width: 300px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+									<img src="images/covid.jpg" alt="" style="max-width: 100%; height: auto;" />
+								</div>
+
+
+
+
+
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <style>
+                                        code {
+                                            display: block;
+                                            white-space: pre;
+                                            font-family: 'Courier New', monospace;
+                                            padding: 10px;
+                                            background-color: #f5f5f5;
+                                            border: 1px solid #ccc;
+                                            border-radius: 5px;
+                                            margin-bottom: 20px;
+                                            overflow-x: auto;
+                                        }
+                                    </style>
+                                </head>
+                                
+                                <body>
+                                
+                                 <p></p>
+
+                                    <pre class="language-sql">
+                                        <code>
+Select *
+From [Portfolio Project]..CovidDeaths
+order by 3,4
+
+--Select *
+--From [Portfolio Project]..CovidVaccinations
+--order by 3,4
+
+--Select data we will be using
+
+Select Location, date, total_cases, new_cases, total_deaths, population
+From [Portfolio Project]..CovidDeaths
+order by 1,2
+
+--Total cases vs Total deaths
+
+Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
+From [Portfolio Project]..CovidDeaths
+Where location like 'France'
+order by 1,2
+
+--Total cases vs Population France
+
+Select Location, date, total_cases, population, (total_cases/population)*100 as CasesPercentage
+From [Portfolio Project]..CovidDeaths
+Where location like 'France'
+order by 1,2
+
+--Total cases vs Population US
+
+Select Location, date, total_cases, population, (total_cases/population)*100 as CasesPercentage
+From [Portfolio Project]..CovidDeaths
+Where location like '%states%'
+order by 1,2
+
+--Highest infection rate
+
+Select Location, Population, Max(total_cases) as MaxCases, Max((total_cases/population)*100) as PercentagePopulationInfected
+From [Portfolio Project]..CovidDeaths
+Group by Location, Population
+order by 4 desc
+
+--Highest deaths
+
+Select Location, Max(total_deaths) as MaxDeaths 
+From [Portfolio Project]..CovidDeaths
+Group by Location
+order by 2 desc
+
+Select Location, Max(cast(total_deaths as int)) as MaxDeaths -- Use of Cast function because total_deaths was a Varchar, so wrong result
+From [Portfolio Project]..CovidDeaths
+Group by Location
+order by 2 desc
+
+Select Location, Max(cast(total_deaths as int)) as MaxDeaths
+From [Portfolio Project]..CovidDeaths
+Where continent is not null			-- We had the continents before, could have integrated this before. But doesn't really matter
+Group by Location
+order by 2 desc
+
+
+
+--Let's study continents now
+
+Select location, Max(cast(total_deaths as int)) as MaxDeaths
+From [Portfolio Project]..CovidDeaths
+Where continent is null
+Group by location
+order by 2 desc
+
+
+ --Accross the entire world
+
+
+Select date, SUM(new_cases) --Gives the total cases of the world each day by using the sum function
+From [Portfolio Project]..CovidDeaths
+Where continent is not null
+Group by date
+Order by 1,2
+
+Select date, new_cases   -- Same as above, using the World data
+From [Portfolio Project]..CovidDeaths
+Where location like 'World'
+Order by 1,2
+
+Select date, total_cases   -- Gives the total cases of the world
+From [Portfolio Project]..CovidDeaths
+Where location like 'World'
+Order by 1,2
+
+--Numbers of the World everyday
+
+Select date, new_cases, new_deaths, cast(new_deaths as int)/(new_cases)*100  DeathPercentage   -- I prefer to use the World data instead of summing on every country
+From [Portfolio Project]..CovidDeaths
+Where location like 'World' and new_cases>0 --Do not divide by 0
+Order by 1,2
+
+--Sum of the Numbers of the World
+
+Select SUM(new_cases), SUM(cast(new_deaths as int)),SUM(cast(new_deaths as int))/SUM((new_cases))*100  DeathPercentage   -- I prefer to use the World data instead of summing on every country
+From [Portfolio Project]..CovidDeaths
+Where location like 'World' and new_cases>0 --Do not divide by 0
+
+
+--Looking at Total Population vs Vaccinations
+
+
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location Order by dea.location, dea.date)  RollingVaccinatedPeople
+From [Portfolio Project]..CovidDeaths  dea
+Join [Portfolio Project]..CovidVaccinations  vac
+	On dea.location = vac.location and dea.date=vac.date
+Where dea.continent is not null
+Order by 2,3
+
+
+--However we want to look at the ratio Vaccinated people/population. We cannot use RollingVaccinatedPeople since we just created it
+--We will use a CTE or temp table
+
+With PopVacRatio (continent, location, date, population, new_vaccinations, RollingVaccinatedPeople)
+as
+(
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location Order by dea.location, dea.date)  RollingVaccinatedPeople
+From [Portfolio Project]..CovidDeaths  dea
+Join [Portfolio Project]..CovidVaccinations  vac
+	On dea.location = vac.location and dea.date=vac.date
+Where dea.continent is not null
+--Order by 2,3
+)
+Select * , (RollingVaccinatedPeople/population)*100 as PopulationVaccinationRatio -- This is where we do the ratio of the column we just created
+From PopVacRatio
+
+
+
+
+
+--Using a Temp table (can't make it work)
+
+DROP TABLE if exists #PercentPopulationVaccinated
+Create Table #PercentPopulationVaccinated      -- First we create the table
+(
+continent nvarchar(255), 
+location nvarchar(255), 
+date datetime, 
+population numeric, 
+new_vaccinations numeric,
+RollingVaccinatedPeople numeric,
+)
+
+
+Insert into #PercentPopulationVaccinated				--Then we insert the data in our created table
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location Order by dea.location, dea.date) as RollingVaccinatedPeople
+From [Portfolio Project]..CovidDeaths  dea
+Join [Portfolio Project]..CovidVaccinations  vac
+	On dea.location = vac.location and dea.date=vac.date
+Where dea.continent is not null
+--Order by 2,3
+
+Select *-- , (RollingVaccinatedPeople/population)*100 as PopulationVaccinationRatio
+From #PercentPopulationVaccinated
+
+
+
+
+
+--Creating a view to store data for visualisation
+
+Create View PercentPopulationVaccinated as
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location Order by dea.location, dea.date)  RollingVaccinatedPeople
+From [Portfolio Project]..CovidDeaths  dea
+Join [Portfolio Project]..CovidVaccinations  vac
+	On dea.location = vac.location and dea.date=vac.date
+Where dea.continent is not null
+--Order by 2,3
+
+Select *
+From PercentPopulationVaccinated
+
+
+                                        </code>
+                                    </pre>
+                                </body>
+                                
+                                </html>
+							</section>
+
+
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<section>
+						<form method="post" action="#">
+							<div class="fields">
+								<div class="field">
+									<label for="name">Name</label>
+									<input type="text" name="name" id="name" />
+								</div>
+								<div class="field">
+									<label for="email">Email</label>
+									<input type="text" name="email" id="email" />
+								</div>
+								<div class="field">
+									<label for="message">Message</label>
+									<textarea name="message" id="message" rows="3"></textarea>
+								</div>
+							</div>
+							<ul class="actions">
+								<li><input type="submit" value="Send Message" /></li>
+							</ul>
+						</form>
+					</section>
+					<section class="split contact">
+						<section class="alt">
+							<h3>Location</h3>
+							<p>Paris area, France</p>
+						</section>
+						<section>
+							<h3>Phone</h3>
+							<p><a href="#">+33(0)658322971</a></p>
+						</section>
+						<section>
+							<h3>Email</h3>
+							<p><a href="#">pierre.de-lustrac@gadz.org</a></p>
+						</section>
+						<section>
+							<h3>Social</h3>
+							<ul class="icons alt">
+								<li><a href="https://www.linkedin.com/in/pierre-de-lustrac-a890a1170/" class="icon brands fa-linkedin"><span class="label">linkedin</span></a></li>
+							</ul>
+						</section>
+					</section>
+				</footer>
+
+			<!-- Copyright -->
+				<div id="copyright">
+					<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+				</div>
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
