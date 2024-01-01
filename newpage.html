@@ -39,15 +39,39 @@
 						<!-- Post -->
 							<section class="post">
 								<header class="major">
+
 									<h1>Data exploration in SQL</p>
 								</header>
 								<div class="image main" style="max-width: 300px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
 									<img src="images/covid.jpg" alt="" style="max-width: 100%; height: auto;" />
 								</div>
+								<p><p></p>In order to showcase my SQL skills, I have realized a little project on the Covid-19 pandemic. The main goal is to show I can make inner joins, partitions and that I know how to use Common Table Expression’s (CTE) and Temporary Tables. I have given a list of queries I made at the end of this page.</p>
+								
+								<h2>Introduction</h2>
+								<p>I have used two datasets in .xlsx format mainly giving us the total amount of deaths (that we called CovidDeaths) and the total amount of vaccinations (that we called CovidVaccinations). Here is a snapshot of the datasets:</P>
+								<img src="images/covid1.1.JPG" alt="Snip bit of the data set" style="display: block; margin: 0 auto; max-width: 100%;">
+								<p></p>
+								<img src="images/covid1.2.JPG" alt="Snip bit of the data set" style="display: block; margin: 0 auto; max-width: 100%;">
+								<p></p>
+								
 
+								<h2>An example of what we can get out of these datasets:</h2>
+								<p>We can look at the Total Population vs the total Vaccinations by writing:</p>
+								<img src="images/covid1.3.JPG" style="display: block; margin: 0 auto; max-width: 100%;">
+								<p></p>
+								<p>However, we would like to look at the ratio Vaccinated people/population. Unfortunately, we cannot use “RollingVaccinatedPeople” since we have just created it. We will therefore use a CTE or temp table, both work.</p>
+								<p></p>
+								<p>Here is how we would use a CTE:</p>
+								<p></p>
+								<img src="images/covid1.4.JPG" style="display: block; margin: 0 auto; max-width: 100%;">
+								<p></p>
+								<p>And here is how we would use a temp table:</p>
+								<p></p>
+								<img src="images/covid1.5.JPG" style="display: block; margin: 0 auto; max-width: 100%;">
+								<p></p>
 
-
-
+								<h2>List of examples</h2>
+								<p></p>
 
                                 <!DOCTYPE html>
                                 <html lang="en">
@@ -211,7 +235,7 @@ From PopVacRatio
 
 
 
---Using a Temp table (can't make it work)
+--Using a Temp table
 
 DROP TABLE if exists #PercentPopulationVaccinated
 Create Table #PercentPopulationVaccinated      -- First we create the table
